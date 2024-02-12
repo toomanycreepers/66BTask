@@ -1,0 +1,75 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+.add-confirmation {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    width: 200px;
+    height: 70px;
+    background-color: greenyellow;
+    transform: translateY(200px);
+}
+
+@keyframes anime {
+    0%
+    {
+        transform: translateY(200px);
+    }
+
+    25% {
+        transform: translateY(0);
+    }
+
+    75% {
+        transform: translateY(0);
+    }
+
+    100% {
+        transform: translateY(200px);
+    }
+}
+
+.mw {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0,0,0,0.5);
+    display: none;
+}
+
+.m {
+    width:400px;
+    background-color:white;
+    border-radius: 5%;
+}
+
+.active {
+    display:flex;
+}
+
+.footballer-change-form {
+    margin:30px auto;
+    width: 80%;
+}

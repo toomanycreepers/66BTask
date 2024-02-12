@@ -1,0 +1,90 @@
+﻿@{
+    ViewData["Title"] = "Список футболистов";
+}
+@model List<WebFootballers.Models.Entities.Footballer>
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="table-responsive footballer-list">
+    <table class="table table-striped table-bordered table-hover">
+        <thead>
+            <tr>
+                <th>Имя</th>
+                <th>Фамилия</th>
+                <th>Пол</th>
+                <th>Дата рождения</th>
+                <th>Команда</th>
+                <th>Страна</th>
+                <th>Функции</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var footballer in Model)
+            {
+                <tr>
+                    <td>@footballer.FirstName</td>
+                    <td>@footballer.Surname</td>
+                    <td>@{
+                            string value = footballer.IsMale ? "Мужчина" : "Женщина";
+                        } 
+                        @value
+                    </td>
+                    <td>@footballer.DateOfBirth.ToString()</td>
+                    <td>@footballer.Team.Name</td>
+                    <td>@footballer.Country.ToString()</td>
+                    <td><button class="edit-footballer" data-footballer-id="@footballer.Id">Изменить</button></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="mw">
+    <div class="m">
+        <form class="container p-3 footballer-change-form"
+         asp-controller="Home"
+              asp-action="AlterFootballer"
+         method="post">
+            <input style="display:none;" type="number" id="Id" name="Id" required readonly>
+            <div class="mb-3">
+                <label for="FirstName" class="form-label">Имя:</label>
+                <input type="text" class="form-control" id="FirstName" name="FirstName" required>
+            </div>
+            <div class="mb-3">
+                <label for="Surname" class="form-label">Фамилия:</label>
+                <input type="text" class="form-control" id="Surname" name="Surname" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-check-label">Пол:</label>
+                <div class="form-check">
+                    <input type="radio" class="form-check-input" id="male" name="IsMale" value="true" required>
+                    <label for="male" class="form-check-label">Мужской</label>
+                </div>
+                <div class="form-check">
+                    <input type="radio" class="form-check-input" id="female" name="IsMale" value="false">
+                    <label for="female" class="form-check-label">Женский</label>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="Dob" class="form-label">Дата рождения:</label>
+                <input type="date" class="form-control" id="Dob" name="Dob" required>
+            </div>
+            <div class="mb-3">
+                <label for="Team" class="form-label">Название команды:</label>
+                <input type="text" class="form-control ui-autocomplete-input" id="Team" name="Team" required>
+            </div>
+            <div class="mb-3">
+                <label for="Country" class="form-label">Страна:</label>
+                <select class="form-select" id="Country" name="Country">
+                    @{
+                        foreach (var country in Enum.GetValues(typeof(WebFootballers.Models.Utility.Country)))
+                        {
+                            <option value="@country.ToString()">@country.ToString()</option>
+                        }
+                    }
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Изменить</button>
+        </form>
+    </div>
+</div>
