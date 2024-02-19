@@ -1,13 +1,12 @@
 ﻿@{
     ViewData["Title"] = "Добавление футболистов";
 }
-@model WebFootballers.Models.Entities.Footballer
     <div class="text-center">
         <h1 class="display-4">Добавь футболиста</h1>
         <p>Просто укажи все его данные и нажми "отправить"</p>
     </div>
 
-    <form asp-controller="Home"
+    <form asp-controller="Footballer"
           asp-action="AddFootballer"
           method="post"
           data-ajax="true"

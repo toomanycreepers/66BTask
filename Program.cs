@@ -1,3 +1,6 @@
+using WebFootballers.AppServices;
+using WebFootballers.Data;
+
 namespace WebFootballers
 {
     public class Program
@@ -8,6 +11,9 @@ namespace WebFootballers
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+            builder.Services.AddDbContext<WebFootballersDbContext>();
+            builder.Services.AddScoped<FootballerService>();
+            builder.Services.AddScoped<FootballTeamService>();
 
             var app = builder.Build();
 

@@ -1,33 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using WebFootballers.Data;
-using WebFootballers.Models.Entities;
+﻿using Microsoft.AspNetCore.Mvc;
+using WebFootballers.AppServices;
 
 namespace WebFootballers.Controllers
 {
     [Route("Football/Teams")]
     public class FootballTeamsController : Controller
     {
-        private WebFootballersDbContext db = new WebFootballersDbContext();
+        private readonly FootballTeamService _service;
 
-        [Produces("application/json")]
+        public FootballTeamsController(FootballTeamService footballTeamsService)
+        {
+            _service = footballTeamsService;
+        }
+
         [HttpGet("search")]
-        public async Task<IActionResult> GetRelevantTeams()
+        public async Task<ActionResult<List<string>>> GetRelevantTeams()
         {
             try
             {
                 string term = HttpContext.Request.Query["term"].ToString();
-                var names = db.FootballTeams.Where(p => p.Name.Contains(term)).Select(p => p.Name).ToList();
+                var names = await _service.GetRelevantTeamNames(term);
                 return Ok(names);
             }
-            catch
+            catch(ArgumentException e)
             {
-                return BadRequest();
+                return BadRequest(e.Message);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e.Message);
             }
         }
     
