@@ -1,6 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using WebFootballers.Data;
+﻿using Microsoft.IdentityModel.Tokens;
+using WebFootballers.Data.Repositories;
 using WebFootballers.Models.DTOs;
 using WebFootballers.Models.Entities;
 using WebFootballers.Models.Utility;
@@ -9,40 +8,40 @@ namespace WebFootballers.AppServices
 {
     public class FootballerService
     {
-        private readonly WebFootballersDbContext _context;
+        private FootballerRepository _fRepo;
+        private FootballTeamRepository _teamRepo;
+        private bool disposed = false;
 
-        public FootballerService(WebFootballersDbContext dbContext)
+        public FootballerService(FootballerRepository footballerRepository,FootballTeamRepository teamRepository)
         {
-            _context = dbContext;
+            _fRepo = footballerRepository;
+            _teamRepo = teamRepository;
         }
 
-        public List<Footballer> GetAllFootballers()
+        public async Task<List<Footballer>> GetAllFootballers()
         {
-            var footballers = _context.Footballers.Include(f => f.Team).ToList();
-            return footballers;
+            return await _fRepo.GetAllFootballers();
         }
 
-        public void AddFootballer(FootballerCreationDTO dto)
+        public async Task AddFootballer(FootballerCreationDTO dto)
         {
             if (Enum.TryParse(dto.Country, out Country country))
             {
-                if (!(_context.FootballTeams.Any(p => p.Name.Contains(dto.Team))))
+                if ((await _teamRepo.FindBySearchTerm(dto.Team)).IsNullOrEmpty())
                 {
-                    AddTeam(dto.Team);
+                    await _teamRepo.Add(new FootballTeam() {Name = dto.Team});
                 }
 
                 var footballer = new Footballer
                 {
-                    FirstName = dto.FirstName,
+                    Name = dto.FirstName,
                     Surname = dto.Surname,
                     DateOfBirth = DateOnly.Parse(dto.Dob),
                     IsMale = bool.Parse(dto.IsMale),
                     Country = country,
-                    Team = _context.FootballTeams.FirstOrDefault(t => t.Name == dto.Team)
+                    Team = await _teamRepo.GetByName(dto.Team)
                 };
-
-                _context.Add(footballer);
-                _context.SaveChanges();
+                await _fRepo.Add(footballer);
             }
             else
             {
@@ -50,38 +49,45 @@ namespace WebFootballers.AppServices
             }
         }
 
-        private void AddTeam(string name)
+        public async Task AlterFootballer(FootballerDTO dto)
         {
-            if (string.IsNullOrEmpty(name)) return;
-
-            var team = new FootballTeam { Name = name };
-            _context.FootballTeams.Add(team);
-            _context.SaveChanges();
-        }
-
-        public void AlterFootballer(FootballerDTO dto)
-        {
-            Footballer footballer = _context.Footballers.FirstOrDefault(f => f.Id == dto.Id);
-            if (footballer == null)
-            {
-                throw new ArgumentException("Footballer not found");
-            }
-
-            footballer.FirstName = dto.FirstName;
-            footballer.Surname = dto.Surname;
-            footballer.DateOfBirth = DateOnly.Parse(dto.Dob);
-            footballer.IsMale = bool.Parse(dto.IsMale);
-
             if (Enum.TryParse(dto.Country, out Country country))
             {
-                footballer.Country = country;
+                var footballer = new Footballer
+                {
+                    Id = dto.Id,
+                    Name = dto.FirstName,
+                    Surname = dto.Surname,
+                    DateOfBirth = DateOnly.Parse(dto.Dob),
+                    IsMale = bool.Parse(dto.IsMale),
+                    Country = country,
+                    Team = await _teamRepo.GetByName(dto.Team)
+                };
+                await _fRepo.Update(footballer);
             }
-            else 
+            else
             {
                 throw new ArgumentException("Invalid Country");
             }
-            footballer.Team = _context.FootballTeams.FirstOrDefault(t => t.Name == dto.Team);
-            _context.SaveChanges();
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!this.disposed)
+            {
+                if (disposing)
+                {
+                    _fRepo.Dispose();
+                    _teamRepo.Dispose();
+                }
+            }
+            this.disposed = true;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }

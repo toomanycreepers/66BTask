@@ -36,8 +36,14 @@ const openModal = (event) => {
     const dob = document.querySelector("#Dob")
     const dobText = event.target.parentElement.previousElementSibling
         .previousElementSibling.previousElementSibling.textContent
+    const dobTextParts = dobText.split("/")
+    const formattedDate = dobTextParts[2] + '-' + dobTextParts[0] + '-' + dobTextParts[1]
+    console.log(formattedDate)
+    /*
     const dobTextParts = dobText.split(".")
-    const formattedDate = dobTextParts[2] + '-' + dobTextParts[1] + '-' + dobTextParts[0]
+    const formattedDate = dobTextParts[2] + '-' + dobTextParts[1] + '-' + dobTextParts[0] 
+    Форматирование для неконтейнерного запуска.
+    */
     dob.value = formattedDate
 
 

@@ -14,13 +14,13 @@ namespace WebFootballers.Controllers
         }
 
         [HttpPost]
-        public IActionResult AddFootballer([FromForm] FootballerCreationDTO dto)
+        public async Task<IActionResult> AddFootballer([FromForm] FootballerCreationDTO dto)
         {
             if (ModelState.IsValid)
             {
                 try 
                 {
-                    _footballerService.AddFootballer(dto);
+                    await _footballerService.AddFootballer(dto);
                     return Ok();
                 }
                 catch (ArgumentException e) 
@@ -32,13 +32,13 @@ namespace WebFootballers.Controllers
         }
 
         [HttpPost]
-        public IActionResult AlterFootballer([FromForm] FootballerDTO dto)
+        public async Task<IActionResult> AlterFootballer([FromForm] FootballerDTO dto)
         {
             if (ModelState.IsValid)
             {
                 try 
                 {
-                    _footballerService.AlterFootballer(dto);
+                    await _footballerService.AlterFootballer(dto);
                     return RedirectToAction("FootballerList", "Home");
                 }
                 catch(ArgumentException e)

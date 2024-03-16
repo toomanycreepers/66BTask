@@ -1,5 +1,7 @@
+using Microsoft.EntityFrameworkCore;
 using WebFootballers.AppServices;
 using WebFootballers.Data;
+using WebFootballers.Data.Repositories;
 
 namespace WebFootballers
 {
@@ -11,9 +13,15 @@ namespace WebFootballers
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
-            builder.Services.AddDbContext<WebFootballersDbContext>();
+            var dbHost = Environment.GetEnvironmentVariable("DB_HOST");
+            var dbName = Environment.GetEnvironmentVariable("DB_NAME");
+            var dbPassword = Environment.GetEnvironmentVariable("DB_SA_PASSWORD");
+            builder.Services.AddDbContext<WebFootballersDbContext>(
+                options => options.UseSqlServer($"Server={dbHost};Database={dbName};User=sa;Password={dbPassword};Trust Server Certificate=True"));
             builder.Services.AddScoped<FootballerService>();
             builder.Services.AddScoped<FootballTeamService>();
+            builder.Services.AddScoped<FootballerRepository>();
+            builder.Services.AddScoped<FootballTeamRepository>();
 
             var app = builder.Build();
 
@@ -36,6 +44,16 @@ namespace WebFootballers
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
 
+            using (var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+
+                var context = services.GetRequiredService<WebFootballersDbContext>();
+                if (context.Database.GetPendingMigrations().Any())
+                {
+                    context.Database.Migrate();
+                }
+            }
             app.Run();
         }
     }

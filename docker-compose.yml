@@ -1,0 +1,33 @@
+version: '3'
+
+networks:
+    webfootballersnet:
+
+services:
+  database:
+    container_name: app-db
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    ports:
+        - 1400:1433
+    environment:
+        - ACCEPT_EULA=Y
+        - SA_PASSWORD=Y@bb@D@bbaD0
+    networks:
+        - webfootballersnet
+  webfootballers:
+    container_name: web-footballers
+    image: ${DOCKER_REGISTRY-}webfootballers
+    build:
+        context: .
+        dockerfile: Dockerfile
+    ports:
+        - 8080:80
+        - 4000:443
+    depends_on:
+        - database
+    environment:
+        - DB_HOST=database
+        - DB_NAME=dockerfootball
+        - DB_SA_PASSWORD=Y@bb@D@bbaD0
+    networks:
+        - webfootballersnet

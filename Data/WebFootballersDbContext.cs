@@ -9,12 +9,14 @@ namespace WebFootballers.Data
         public DbSet<Footballer> Footballers { get; set; } = null!;
         public DbSet<FootballTeam> FootballTeams { get; set; } = null!;
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        public WebFootballersDbContext(DbContextOptions<WebFootballersDbContext> options) :base(options) 
         {
-            var config = new Configuration().GetConfiguration();
-            optionsBuilder.UseSqlServer(config.GetConnectionString("DevDB")).LogTo(s => System.Diagnostics.Debug.WriteLine(s))
-                          .EnableDetailedErrors()
-                          .EnableSensitiveDataLogging();
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Footballer>().Property(f => f.Name).HasColumnName("FirstName");
+            base.OnModelCreating(modelBuilder);
         }
 
         protected override void ConfigureConventions(ModelConfigurationBuilder builder)

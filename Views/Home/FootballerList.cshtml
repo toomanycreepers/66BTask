@@ -19,10 +19,10 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var footballer in Model)
+            @foreach (WebFootballers.Models.Entities.Footballer footballer in Model)
             {
                 <tr>
-                    <td>@footballer.FirstName</td>
+                    <td>@footballer.Name</td>
                     <td>@footballer.Surname</td>
                     <td>@{
                             string value = footballer.IsMale ? "Мужчина" : "Женщина";

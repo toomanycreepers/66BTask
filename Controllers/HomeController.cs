@@ -22,9 +22,9 @@ namespace WebFootballers.Controllers
             return View();
         }
 
-        public IActionResult FootballerList()
+        public async Task<IActionResult> FootballerList()
         {
-            var footballers = _footballerService.GetAllFootballers();
+            var footballers = await _footballerService.GetAllFootballers();
             return View(footballers);
         }
 

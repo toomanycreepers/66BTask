@@ -2,10 +2,7 @@
 
 namespace WebFootballers.Models.Entities
 {
-    public class FootballTeam
+    public class FootballTeam : BaseEntity
     { 
-        public long Id { get; set; }
-        [Required]
-        public string Name { get; set; } = null!;
     }
 }

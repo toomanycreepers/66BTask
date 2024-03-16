@@ -1,16 +1,16 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using WebFootballers.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using WebFootballers.Data.Repositories;
 
 namespace WebFootballers.AppServices
 {
-    public class FootballTeamService
+    public class FootballTeamService : IDisposable
     {
-        private readonly WebFootballersDbContext _context;
+        private readonly FootballTeamRepository _repo;
+        private bool disposed = false;
 
-        public FootballTeamService(WebFootballersDbContext context)
+        public FootballTeamService(FootballTeamRepository repo)
         {
-            _context = context;
+            _repo = repo;
         }
 
         public async Task<List<string>> GetRelevantTeamNames(string searchTerm)
@@ -19,13 +19,25 @@ namespace WebFootballers.AppServices
             {
                 throw new ArgumentException("Search term cannot be null or empty");
             }
+            return await _repo.FindBySearchTerm(searchTerm);
+        }
 
-            var teamNames = await _context.FootballTeams
-                .Where(team => team.Name.Contains(searchTerm))
-                .Select(team => team.Name)
-                .ToListAsync();
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!this.disposed)
+            {
+                if (disposing)
+                {
+                    _repo.Dispose();
+                }
+            }
+            this.disposed = true;
+        }
 
-            return teamNames;
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }
